@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 public class ApplicationService : IApplicationService
 {
