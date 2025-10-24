@@ -1,22 +1,24 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Npgsql;
 using Serilog;
 
-var builder = new ConfigurationBuilder();
-BuildConfig(builder);
+var config = BuildConfig();
+var connectionString = BuildConnectionString(config);
 
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Build())
+    .ReadFrom.Configuration(config)
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .CreateLogger();
-
 
 var host = Host.CreateDefaultBuilder(args)
     .UseSerilog()
     .ConfigureServices((context, services) =>
     {
+        services.AddDbContext<FootballLeagueDbContext>(options => options.UseNpgsql(connectionString));
     })
     .Build();
 
@@ -33,9 +35,22 @@ catch (Exception ex)
     Log.CloseAndFlush();
 }
 
-static void BuildConfig(IConfigurationBuilder builder)
+static IConfigurationRoot BuildConfig()
 {
+    var builder = new ConfigurationBuilder();
     builder.SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        .AddEnvironmentVariables();
+        .AddEnvironmentVariables()
+        .AddUserSecrets<Program>();
+
+    return builder.Build();
+}
+
+static string? BuildConnectionString(IConfigurationRoot config)
+{
+    var connectionBuilder = new NpgsqlConnectionStringBuilder(config.GetConnectionString("DefaultConnection"));
+    connectionBuilder.Username = config["database:username"];
+    connectionBuilder.Password = config["database:password"];
+
+    return connectionBuilder.ConnectionString;
 }
