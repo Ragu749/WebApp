@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
 public class ApplicationService : IApplicationService
 {
@@ -15,14 +14,14 @@ public class ApplicationService : IApplicationService
     }
     public void Start()
     {
-        Log.Logger.Information("Application Service Started");
+        _log.LogInformation("Application Service Started");
         // Add your service logic here
         var testValue = _config["test"];
-        Log.Logger.Information("Test config value: {TestValue}", testValue);
+        _log.LogInformation("Test config value: {TestValue}", testValue);
     }
     public void Stop()
     {
-        Log.Logger.Information("Application Service Stopped");
+        _log.LogInformation("Application Service Stopped");
         // Add your cleanup logic here
     }
 }
