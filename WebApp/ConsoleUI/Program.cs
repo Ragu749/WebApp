@@ -43,7 +43,7 @@ static IConfigurationRoot BuildConfig()
         .AddEnvironmentVariables()
         .AddUserSecrets<Program>();
 
-    return builder.Build();
+    return builder.Build(); 
 }
 
 static string? BuildConnectionString(IConfigurationRoot config)
